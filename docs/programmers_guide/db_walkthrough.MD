@@ -93,9 +93,11 @@ The values are RLP-encoded list of 2 structures:
 1. List of transactions
 2. List of ommers (a.k.a uncles)
 
-In the case of the genesis block, all of these lists are empty (RLP encodings `0xC0`), and the prefix `0xC3` means
-in RLP "some number of sub-structures with the total length of 3 bytes".
+In the case of the genesis block, all of these lists are empty (RLP encodings `0xC0`), and the prefix `0xC2` means
+in RLP "some number of sub-structures with the total length of 2 bytes".
 
+Tables "Last Header", "Last Fast", and "Last Block"
+----------------------
 
 Next three tables, "Last Header", "Last Fast", and "Last Block", always contain just one record each, and their
 keys are always the same, the ASCII-encodings of the strings `LastHeader`, `LastFast`, and `LastBlock`, respectively.
@@ -353,19 +355,12 @@ Here is how the database looks like. Since go-ethereum uses LevelDB, and LevelDB
 "tables"), go-ethereum emulates them by adding table-specific prefixes to all the keys, with the exception of the keys that
 describe the state trie (bucket "Hashes" in our example). In the illustration, these prefixes are mostly removed for better
 comparison with Erigon. They were not removed only for the buckets "LastBlock", "LastHeader" and "LastFast", because
-othewise they key would be empty.
+otherwise the key would be empty.
 
 ![geth_genesis_db](geth_changes_0.png)
 
-The buckets "Headers", "Config", "Last Header", "Last Fast", "Last Block", all look identical
+The buckets "Headers", "Block Bodies", "Config", "Last Header", "Last Fast", "Last Block", all look identical
 to those in the Erigon database. We will walk through the ones that are different.
-
-In the bucket "Block Bodies", the value is slightly different:
-
-![geth_genesis_block_bodies](geth_changes_0_b_5.png)
-
-The difference is that the block body has 2 elements instead of 3 in Erigon. The missing element is the list
-of the sender addresses that go-ethereum does not store, but recomputes after loading or caches in memory.
 
 The buckets "Accounts", "History Of Accounts", and "Change Sets" are missing, because go-ethereum uses a very
 different mechanism for storing the state and its history:
@@ -399,15 +394,9 @@ Now we will create the same Transaction for go-ethereum.
 
 ![geth_block1_db](geth_changes_1.png)
 
-The buckets "Receipts", "Headers", "Config", "Last Header", "Last Fast", "Last Block", all look identical
+The buckets "Headers", "Block Bodies", "Config", "Last Header", "Last Fast", "Last Block",
+and "Receipts", all look identical
 to those in the Erigon database. We will walk through the ones that are different.
-
-In the bucket "Block Bodies", the value is slightly different:
-
-![geth_block1_block_bodies](geth_changes_1_b_4.png)
-
-The difference is that the block body is missing the sender address since the send in go-ethereum is computed and in Erigon is stored. 
-For the rest in this case the same changes occurs in terms of block number and block hash.
 
 ![geth_block1_hashes](geth_changes_1_hashes_5.png)
 
